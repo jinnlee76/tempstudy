@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>제62회 세무사 1차 시험 문제집</title>
+    <style>
+        /* 기본적인 레이아웃 및 폰트 스타일 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f6f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            color: #1e40af;
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        /* 컨트롤 영역 (과목 선택) 스타일 */
+        .controls {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .controls label {
+            font-weight: 600;
+            margin-right: 15px;
+            color: #4a5568;
+        }
+
+        .controls select {
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background-color: #fff;
+            font-size: 1rem;
+            min-width: 180px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .controls select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+        
+        /* 문제 카드 스타일 */
+        .question-card {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .question-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            white-space: pre-wrap; /* 줄바꿈 유지 */
+            color: #1a202c;
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            cursor: pointer;
+            padding: 12px;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .option-item:hover {
+            background-color: #eef2ff;
+        }
+        
+        .option-item input[type="radio"] {
+            margin-top: 4px;
+            margin-right: 15px;
+            transform: scale(1.1);
+            cursor: pointer;
+        }
+
+        /* 결과 피드백 스타일 */
+        .feedback {
+            margin-top: 20px;
+            font-weight: 700;
+            padding: 12px;
+            border-radius: 8px;
+            display: none; /* 초기에는 숨김 */
+        }
+
+        .correct {
+            color: #16a34a;
+            background-color: #dcfce7;
+            border: 1px solid #86efac;
+        }
+
+        .incorrect {
+            color: #dc2626;
+            background-color: #fee2e2;
+            border: 1px solid #fca5a5;
+        }
+
+        .explanation {
+            margin-top: 15px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            padding: 15px;
+            background-color: #f1f5f9;
+            border-left: 5px solid #3b82f6;
+            border-radius: 0 8px 8px 0;
+            white-space: pre-wrap; /* 줄바꿈 유지 */
+            display: none; /* 초기에는 숨김 */
+            color: #4a5568;
+        }
+
+        /* 버튼 스타일 */
+        .action-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #fff;
+            background-color: #2563eb;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            margin-top: 25px;
+        }
+
+        .action-btn:hover {
+            background-color: #1e40af;
+            transform: translateY(-2px);
+        }
+
+        .action-btn:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .show-results-btn {
+            background-color: #059669;
+            margin-top: 15px;
+        }
+        
+        .show-results-btn:hover {
+            background-color: #065f46;
+        }
+        
+        /* 채점 결과 요약 스타일 */
+        .score-summary {
+            margin-top: 40px;
+            padding: 25px;
+            background-color: #e2e8f0;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #cbd5e1;
+            display: none; /* 초기에는 숨김 */
+        }
+
+        .score-summary h2 {
+            margin-top: 0;
+            color: #1e40af;
+            font-size: 1.5rem;
+        }
+
+        .score-summary p {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #4a5568;
+            margin: 8px 0;
+        }
+
+        /* 반응형 디자인 */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.6rem;
+            }
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .controls select {
+                width: 100%;
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>제62회 세무사 1차 시험 문제집</h1>
+
+    <div class="controls">
+        <label for="subject-filter">과목 선택:</label>
+        <select id="subject-filter">
+            <option value="all">전체</option>
+            <option value="재정학">재정학</option>
+            <option value="세법학개론">세법학개론</option>
+        </select>
+    </div>
+
+    <div id="quiz-container">
+        <!-- 문제들이 여기에 동적으로 삽입됩니다 -->
+    </div>
+    
+    <button class="action-btn show-results-btn" style="display: none;">채점하기</button>
+    
+    <div id="score-summary" class="score-summary">
+        <!-- 점수 요약이 여기에 표시됩니다 -->
+    </div>
+</div>
+
+<script>
+    // JSON 형식의 문제 데이터
+    // 이 배열에 다른 과목의 문제를 추가하여 확장할 수 있습니다.
+    const questions = [
+        {
+            "id": 1,
+            "subject": "재정학",
+            "question": "바람직한 조세가 갖추어야 할 원칙에 관한 내용이다. 어느 원칙에 해당되는가?\n조세의 납부방법, 시기, 금액 등이 정해진 법률과 규정에 따라 국민들이 이해할 수 있는 방식으로 제시되어야 한다.",
+            "options": [
+                "① 확실성의 원칙",
+                "② 공평성의 원칙",
+                "③ 경제성의 원칙",
+                "④ 중립성의 원칙",
+                "⑤ 신축성의 원칙"
+            ],
+            "correct_answer_index": 0,
+            "explanation": "이 내용은 고전적 조세 4원칙 중 아담 스미스(Adam Smith)가 제시한 **'확실성의 원칙(Canon of Certainty)'**에 해당됩니다.\n\n확실성의 원칙은 조세의 납부 방법, 시기, 금액 등이 납세자에게 명확하게 제시되어야 한다는 것을 의미합니다. 이는 조세 행정의 투명성과 예측 가능성을 높이는 중요한 원칙입니다."
+        },
+        {
+            "id": 2,
+            "subject": "재정학",
+            "question": "공평과세의 원칙에 관한 설명으로 옳은 것은?",
+            "options": [
+                "① 능력원칙에 의하면 아파트 가격이 올랐다면 재산세를 더 많이 부담해야 한다.",
+                "② 능력원칙은 빅셀(K. Wicksell)이 제시한 동등희생의 원칙이라는 재정이론에 그 근거가 있다.",
+                "③ 편익원칙에 따르면 상이한 경제적 능력을 가진 사람에게는 서로 다른 크기의 조세를 부과해야 한다.",
+                "④ 능력원칙에 따른 과세의 예로 통행료, 사용료 및 수수료가 해당된다.",
+                "⑤ 편익원칙은 밀(J. S. Mill)이 제공한 자발적 교환의 재정이론에서 이념적 기초를 찾을 수 있다."
+            ],
+            "correct_answer_index": 0,
+            "explanation": "공평과세의 능력원칙은 **'수직적 공평성'**을 중요하게 생각합니다. 즉, 소득이나 재산이 많은 사람이 세금을 더 많이 내야 한다는 원칙이죠. 지문 ①은 아파트 가격이 오른 만큼 더 많은 재산세를 부담해야 한다는 것으로, 이는 능력원칙에 부합하는 옳은 설명입니다. \n\n* **오답 해설:**\n    * ② 능력원칙은 헨리 사이먼스(Henry Simons)의 능력주의에 기반합니다. 빅셀은 자발적 교환 이론과 편익원칙에 가깝습니다.\n    * ③ 편익원칙은 세금 납부액을 정부 서비스로부터 얻는 편익에 비례해 부과하는 것입니다. 능력과 관계없이 동일한 편익을 얻는다면 동일한 세금을 내야 합니다.\n    * ④ 통행료, 사용료 등은 정부 서비스의 편익을 누리는 사람이 비용을 부담하는 것이므로 **편익원칙**의 예시입니다.\n    * ⑤ 편익원칙은 빅셀과 린달(Lindahl)의 자발적 교환 이론에 기반을 둡니다. 밀은 능력원칙에 더 가깝습니다."
+        },
+        {
+            "id": 3,
+            "subject": "재정학",
+            "question": "공공재에 대한 설명으로 옳은 것을 모두 고른 것은?",
+            "options": [
+                "① 공공재는 비경합성과 비배제성의 특성을 갖는다.",
+                "② 공공재의 시장 수요곡선은 개별 소비자의 수요곡선을 수평으로 합산하여 도출한다.",
+                "③ 공공재는 무임승차 문제로 인해 시장에서 과다 생산되는 경향이 있다.",
+                "④ 공공재의 최적 공급 수준은 개별 소비자의 한계편익 합계와 한계비용이 일치하는 지점에서 결정된다."
+            ],
+            "correct_answer_index": 3,
+            "explanation": "공공재는 **비경합성**과 **비배제성**의 특성을 가집니다. \n\n* **정답인 이유:** \n    * ④ 공공재의 최적 공급량은 Samuelson 조건에 따라 **'개별 소비자의 한계편익의 합 = 한계비용'**이 되는 지점에서 결정됩니다. 이는 사회적 총편익이 최대가 되는 지점입니다.\n\n* **오답인 이유:**\n    * ① 공공재는 비경합성과 비배제성의 특성을 갖는 것이 맞지만, '모두 고른 것'을 묻는 문제이므로 이 하나만으로는 정답이 될 수 없습니다. (샘플 데이터이므로 지문 구성이 간단함)\n    * ② 공공재의 수요곡선은 **수직으로 합산**합니다. 각 소비자는 동일한 양의 공공재를 소비하므로 한계편익을 합산해야 하기 때문입니다. 일반 사유재는 수평 합산입니다.\n    * ③ 공공재는 무임승차(Free-Rider) 문제로 인해 시장에서 **과소 생산**되는 경향이 있습니다. 공급이 부족해지기 쉽습니다."
+        },
+        {
+            "id": 41,
+            "subject": "세법학개론",
+            "question": "<국세기본법> 국세기본법령상 납세자의 권리 등에 관한 설명으로 옳지 않은 것은?",
+            "options": [
+                "① 세무서장 등은 과세전적부심사 청구가 청구기간이 지난 후에 청구된 경우 국세심사위원회의 심사를 거쳐 청구를 채택하지 아니한다는 결정을 한다.",
+                "② 납세자가 세무공무원에게 직무와 관련하여 금품을 제공한 경우에 세무공무원은 같은 세목 및 같은 과세기간에 대하여 재조사를 할 수 있다.",
+                "③ 세무공무원은 다른 과세기간ㆍ세목 또는 항목에 대한 구체적인 세금탈루 증거자료가 확인되어 다른 과세기간ㆍ세목 또는 항목에 대한 조사가 필요한 경우에는 세무조사의 범위를 확대할 수 있다.",
+                "④ 세무공무원이 납세자에게 사전통지를 하면 증거인멸 등으로 조사 목적을 달성할 수 없다고 인정되는 경우에는 조사를 받을 납세자에게 세무조사를 시작하기 전에 조사대상 세목, 조사기간 및 조사 사유 등을 통지하지 않아도 된다.",
+                "⑤ 세무공무원은 국가통계작성 목적으로 그 사용 목적에 맞는 범위에서 과세정보를 요구하는 통계청장에게 국세의 부과ㆍ징수를 위하여 업무상 취득한 자료 등을 제공할 수 있다."
+            ],
+            "correct_answer_index": 0,
+            "explanation": "정답은 ①번입니다.\n\n* **오답 해설:**\n    * ① 과세전적부심사 청구가 청구기간이 지난 후에 제기되었을 경우, 국세심사위원회의 심사를 거치지 않고 **'각하'** 결정을 내릴 수 있습니다. '채택하지 아니한다는 결정'은 심사를 거치지만, 각하는 심사 자체를 하지 않는다는 의미이므로 틀린 설명입니다."
+        },
+        {
+            "id": 42,
+            "subject": "세법학개론",
+            "question": "세법 해석에 대한 설명으로 옳은 것은?",
+            "options": [
+                "① 조세법률주의 원칙상 세법을 엄격하게 해석해야 하므로 목적론적 해석이나 유추해석은 허용되지 않는다.",
+                "② 세법의 문언이 조세회피의 목적으로 명백히 부적절하게 사용된 경우에는 유추해석이 허용될 수 있다.",
+                "③ 조세법규를 납세자에게 불리하게 유추 또는 확장 해석하는 것은 허용되지 않으나, 납세자에게 유리하게 유추 또는 확장 해석하는 것은 허용된다.",
+                "④ 신의성실의 원칙은 납세자에게만 적용되는 원칙이다.",
+                "⑤ 조세평등주의는 헌법상 평등 원칙으로부터 도출되며, 합리적인 근거 없는 세부담 차별을 금지한다."
+            ],
+            "correct_answer_index": 4,
+            "explanation": "정답은 ⑤번입니다.\n\n* **정답인 이유:** \n    * ⑤ 조세평등주의는 헌법 제11조 평등의 원칙에서 파생된 원칙으로, 납세자 간에 합리적인 이유 없이 세금 부담을 차별하는 것을 금지합니다. 이는 수평적 공평성과 수직적 공평성을 모두 포함하는 개념입니다.\n\n* **오답 해설:**\n    * ① 조세법률주의 원칙에 따라 엄격한 해석이 원칙이지만, 입법 목적 등을 고려하는 **목적론적 해석**은 허용됩니다. 다만, 예측 가능성을 해치는 **유추해석**이나 확장해석은 엄격하게 금지됩니다.\n    * ② 조세회피 목적이라 하더라도 유추해석은 허용되지 않습니다.\n    * ③ 조세법규는 납세자에게 불리하든 유리하든 유추 또는 확장 해석이 허용되지 않습니다. 조세법률주의의 원칙에 따라 법에 명시된 대로 해석해야 합니다.\n    * ④ 신의성실의 원칙은 **납세자뿐만 아니라 과세관청에도** 적용되는 원칙입니다."
+        }
+    ];
+
+    const quizContainer = document.getElementById('quiz-container');
+    const subjectFilter = document.getElementById('subject-filter');
+    const showResultsBtn = document.querySelector('.show-results-btn');
+    const scoreSummary = document.getElementById('score-summary');
+
+    let userAnswers = {};
+    let currentQuestions = [];
+    
+    // 문제 데이터를 HTML로 렌더링하는 함수
+    function renderQuestions(subject = 'all') {
+        quizContainer.innerHTML = ''; // 기존 문제 제거
+        userAnswers = {}; // 사용자 답안 초기화
+        scoreSummary.style.display = 'none'; // 점수 요약 숨김
+        showResultsBtn.style.display = 'block'; // 채점하기 버튼 표시
+
+        // 선택한 과목에 따라 문제 필터링
+        currentQuestions = questions.filter(q => subject === 'all' || q.subject === subject);
+        
+        if (currentQuestions.length === 0) {
+            quizContainer.innerHTML = '<p style="text-align: center; color: #666;">선택하신 과목의 문제가 없습니다.</p>';
+            showResultsBtn.style.display = 'none'; // 문제가 없으면 버튼 숨김
+            return;
+        }
+
+        currentQuestions.forEach(question => {
+            // 각 문제를 담을 카드 엘리먼트 생성
+            const questionCard = document.createElement('div');
+            questionCard.className = 'question-card';
+            questionCard.setAttribute('data-question-id', question.id);
+            
+            // 문제 제목 (번호와 내용)
+            const questionTitle = document.createElement('div');
+            questionTitle.className = 'question-title';
+            questionTitle.innerHTML = `${question.id}. ${question.question}`;
+            questionCard.appendChild(questionTitle);
+
+            // 보기를 담을 리스트 엘리먼트
+            const optionsList = document.createElement('ul');
+            optionsList.className = 'options-list';
+            
+            question.options.forEach((option, index) => {
+                // 각 보기를 담을 리스트 아이템 생성
+                const optionItem = document.createElement('li');
+                optionItem.className = 'option-item';
+                
+                // 라디오 버튼 생성
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = `question-${question.id}`;
+                radio.value = index;
+                
+                const optionText = document.createTextNode(option);
+                
+                optionItem.appendChild(radio);
+                optionItem.appendChild(optionText);
+                
+                // 보기 클릭 시 라디오 버튼 선택 및 답안 저장
+                optionItem.addEventListener('click', () => {
+                    radio.checked = true;
+                    userAnswers[question.id] = index;
+                });
+                
+                optionsList.appendChild(optionItem);
+            });
+            
+            questionCard.appendChild(optionsList);
+            quizContainer.appendChild(questionCard);
+        });
+    }
+    
+    // 채점 결과를 표시하는 함수
+    function showResults() {
+        let correctCount = 0;
+        let incorrectCount = 0;
+
+        currentQuestions.forEach(question => {
+            const questionCard = document.querySelector(`.question-card[data-question-id="${question.id}"]`);
+            if (!questionCard) return;
+
+            const selectedAnswerIndex = userAnswers[question.id];
+            
+            // 기존 피드백/해설 제거
+            const existingFeedback = questionCard.querySelector('.feedback');
+            if (existingFeedback) existingFeedback.remove();
+            const existingExplanation = questionCard.querySelector('.explanation');
+            if (existingExplanation) existingExplanation.remove();
+            
+            // 정답 정보가 있는 경우에만 채점 및 피드백 제공
+            if (question.correct_answer_index !== null) {
+                const isCorrect = (selectedAnswerIndex !== undefined && selectedAnswerIndex === question.correct_answer_index);
+                
+                if (isCorrect) {
+                    correctCount++;
+                } else {
+                    incorrectCount++;
+                }
+
+                const feedbackDiv = document.createElement('div');
+                feedbackDiv.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+                feedbackDiv.style.display = 'block';
+                feedbackDiv.textContent = isCorrect ? '✅ 정답입니다!' : '❌ 오답입니다.';
+                
+                // 해설 표시
+                const explanationDiv = document.createElement('div');
+                explanationDiv.className = 'explanation';
+                explanationDiv.style.display = 'block';
+                explanationDiv.innerHTML = question.explanation ? `<strong>해설:</strong><br>${question.explanation}` : '해설이 준비되지 않았습니다.';
+                
+                questionCard.appendChild(feedbackDiv);
+                questionCard.appendChild(explanationDiv);
+
+                // 정답/오답 보기에 시각적 효과 추가
+                const radios = questionCard.querySelectorAll(`input[name="question-${question.id}"]`);
+                radios.forEach((radio, index) => {
+                    const parentLi = radio.parentElement;
+                    parentLi.style.border = '1px solid transparent'; // 테두리 초기화
+                    parentLi.style.backgroundColor = 'transparent'; // 배경색 초기화
+                    
+                    if (index === question.correct_answer_index) {
+                        parentLi.style.backgroundColor = '#dcfce7'; // 정답은 초록색 배경
+                        parentLi.style.border = '1px solid #4ade80';
+                    }
+                    if (selectedAnswerIndex === index && selectedAnswerIndex !== question.correct_answer_index) {
+                         parentLi.style.backgroundColor = '#fee2e2'; // 사용자가 선택한 오답은 빨간색 배경
+                         parentLi.style.border = '1px solid #f87171';
+                    }
+                });
+            }
+        });
+        
+        // 최종 점수 요약
+        const totalQuestions = currentQuestions.length;
+        const score = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0;
+        
+        scoreSummary.innerHTML = `
+            <h2>채점 결과</h2>
+            <p>총 문제 수: ${totalQuestions}개</p>
+            <p>맞힌 문제 수: ${correctCount}개</p>
+            <p>틀린 문제 수: ${incorrectCount}개</p>
+            <p><strong>점수: ${score.toFixed(1)}점</strong></p>
+        `;
+        scoreSummary.style.display = 'block';
+    }
+    
+    // 이벤트 리스너
+    // 과목 필터 드롭다운 변경 시 문제 목록 업데이트
+    subjectFilter.addEventListener('change', (e) => {
+        renderQuestions(e.target.value);
+    });
+    
+    // 채점하기 버튼 클릭 시 결과 표시
+    showResultsBtn.addEventListener('click', showResults);
+
+    // 페이지 로드 시 초기 렌더링
+    window.onload = () => {
+        renderQuestions('all');
+    };
+</script>
+
+</body>
+</html>
